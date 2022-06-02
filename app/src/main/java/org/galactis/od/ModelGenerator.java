@@ -44,9 +44,7 @@ public class ModelGenerator {
             code += "\n\t";
             String className = Util.getClassName(model);
             code = String.format(code, className, "inherit", model);
-        }        
-                
-        
+        }       
 
         Util.printToFile(code, modelFile.getPath());
         String init = "from . import " + Util.getModelShortUnderscoredName(model);
