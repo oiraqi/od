@@ -1,0 +1,5 @@
+od -m a3.course -v -g a3.group_faculty:1000 a3.group_coordinator:1110 -u
+od -m a3.course -f code:Char:Code sequence:i:Sequence
+
+od -m a3quality.portfolio -v -g a3.group_faculty:1111 a3.group_coordinator:1000 a3.group_vpaa:1000
+od -m a3quality.portfolio -f 

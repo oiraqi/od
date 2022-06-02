@@ -1,0 +1,2 @@
+args="$@"
+./gradlew run --args="$args"
