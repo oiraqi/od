@@ -13,15 +13,26 @@ public class App {
     public static void main(String[] args) throws Exception {
         Map<String, String> argMap = CommandParser.parse(args);
         System.out.println(argMap);
-
+        String model = null;
+        boolean inherit = false;
         if (argMap.get("n") != null) {
-            ModelGenerator.create(argMap.get("n"), argMap.get("d"), argMap.get("g"), argMap.get("i") != null);
+            model = argMap.get("n");
+        } else if (argMap.get("i") != null) {
+            model = argMap.get("i");
+            inherit = true;
+        }
+
+        if (model != null) {
+            ModelGenerator.create(model, argMap.get("d"), argMap.get("g"), inherit);
             if (argMap.get("f") != null) {
-                ModelGenerator.addFields(argMap.get("n"), argMap.get("f"));
+                ModelGenerator.addFields(model, argMap.get("f"));
             }
-            if (argMap.get("v") != null) {
-                ViewGenerator.create(argMap.get("n"), argMap.get("v"));
-            }
+            if (!inherit && argMap.get("v") != null) {
+                ViewGenerator.create(model, argMap.get("v"));
+            }            
+        }
+        if (argMap.get("m") != null) {
+            MenuGenerator.create(model, argMap.get("m"));
         }
     }
 }

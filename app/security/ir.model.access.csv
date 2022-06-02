@@ -1,4 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_a3_course_faculty,access.a3.course.faculty,model_a3_course,a3.group_faculty,1,0,0,0
 access_a3_course_coordinator,access.a3.course.coordinator,model_a3_course,a3.group_coordinator,1,1,1,0
+access_a3_course_vpaa,access.a3.course.vpaa,model_a3_course,a3.group_vpaa,1,0,0,0
 

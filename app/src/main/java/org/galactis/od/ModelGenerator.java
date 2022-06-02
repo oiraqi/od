@@ -14,6 +14,7 @@ public class ModelGenerator {
         File models = new File("./models");
         if (!models.exists()) {
             models.mkdir();
+            Util.printToFile("from . import models\n", "./__init__.py");
         }
         File security = new File("./security");
         if (!security.exists() && groups != null) {
@@ -24,21 +25,33 @@ public class ModelGenerator {
         String fileName = Util.getModelShortUnderscoredName(model);
         File modelFile = new File("./models/" + fileName + ".py"); // Path Traversal!!!
         if (modelFile.exists()) {
+            if (groups != null) {
+                updateAccessRights(model, groups);
+            }
             return;
         }
         if (!inherit && groups == null) {
             throw new GroupsMissingException();
         }
         String code = "from odoo import models, fields\n\n\n"
-                + "class %s(models.Model):\n\t_%s = '%s'\n\t_description = '%s'\n\n\tname = fields.Char('Name', required=True)\n\t";
-        String className = Util.getClassName(model);
-        code = String.format(code, className, inherit ? "inherit" : "name", model,
+                + "class %s(models.Model):\n\t_%s = '%s'\n\t";
+        if (!inherit) {
+            code += "_description = '%s'\n\n\tname = fields.Char('Name', required=True)\n\t";
+            String className = Util.getClassName(model);
+            code = String.format(code, className, "name", model,
                 description == null ? Util.getClassName(model) : description);
+        } else {
+            code += "\n\t";
+            String className = Util.getClassName(model);
+            code = String.format(code, className, "inherit", model);
+        }        
+                
+        
 
         Util.printToFile(code, modelFile.getPath());
         String init = "from . import " + Util.getModelShortUnderscoredName(model);
         if (!Util.alreadyExists(init, "./__init__.py")) {
-            Util.appendToFile(init + "\n", "./__init__.py");
+            Util.appendToFile(init + "\n", "./models/__init__.py");
         }        
 
         if (groups != null) {
@@ -111,7 +124,6 @@ public class ModelGenerator {
     }
 
     private static void updateAccessRights(String model, String groups) throws IOException {
-
         String[] groupz = groups.split(" ");
         StringBuilder sb = new StringBuilder();
         for (String groupRight : groupz) {

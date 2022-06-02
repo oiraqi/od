@@ -1,2 +1,1 @@
-from . import course
-from . import course
+from . import models

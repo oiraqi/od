@@ -1,0 +1,3 @@
+./od -m i:a3_root n:Home
+./od -n a3.course -g a3.group_faculty:1000 a3.group_coordinator:1110 a3.group_vpaa:1000 -v Course -m n:Courses p:a3_root_menu
+./od -n a3.course -f code:c:Code instructor_id:mo:a3.faculty:Instructor sch:i:SCH
