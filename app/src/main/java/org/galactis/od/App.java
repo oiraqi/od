@@ -3,8 +3,6 @@
  */
 package org.galactis.od;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 
 public class App {
@@ -12,24 +10,18 @@ public class App {
         return "Hello World!";
     }
 
-    private static void createMenu(String name, String parent, String model, String groups) {
-
-    }
-
     public static void main(String[] args) throws Exception {
         Map<String, String> argMap = CommandParser.parse(args);
         System.out.println(argMap);
 
-        if (argMap.get("m") != null) {
-            ModelGenerator.create(argMap.get("m"), argMap.get("d"), argMap.get("g"), argMap.get("i") != null);
+        if (argMap.get("n") != null) {
+            ModelGenerator.create(argMap.get("n"), argMap.get("d"), argMap.get("g"), argMap.get("i") != null);
             if (argMap.get("f") != null) {
-                ModelGenerator.addFields(argMap.get("m"), argMap.get("f"));
+                ModelGenerator.addFields(argMap.get("n"), argMap.get("f"));
             }
             if (argMap.get("v") != null) {
-                ViewGenerator.create(argMap.get("m"), argMap.get("v"));
+                ViewGenerator.create(argMap.get("n"), argMap.get("v"));
             }
         }
-
-        createMenu(argMap.get("n"), argMap.get("p"), argMap.get("model"), argMap.get("ng"));
     }
 }
