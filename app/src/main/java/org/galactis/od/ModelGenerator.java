@@ -66,41 +66,18 @@ public class ModelGenerator {
             if (Util.in(fieldName + " = ", modelPath)) {
                 continue;
             }
-            
+
             String fieldType = field.split(":")[1];
 
             if (fieldType.equals("mo")) {
                 addMany2oneField(field, modelPath);
-                continue;
-            }
-
-            if (fieldType.equals("om")) {
+            } else if (fieldType.equals("om")) {
                 addOne2manyField(field, model, modelPath);
-                continue;
-            }
-
-            if (fieldType.equals("mm")) {
+            } else if (fieldType.equals("mm")) {
                 addMany2manyField(field, modelPath);
-                continue;
+            } else {
+                addPrimitiveField(field, modelPath);
             }
-
-            if (fieldType.equals("c")) {
-                fieldType = "Char";
-            } else if (fieldType.equals("i")) {
-                fieldType = "Integer";
-            } else if (fieldType.equals("f")) {
-                fieldType = "Float";
-            } else if (fieldType.equals("b")) {
-                fieldType = "Boolean";
-            } else if (fieldType.equals("t")) {
-                fieldType = "Text";
-            } else if (fieldType.equals("h")) {
-                fieldType = "Html";
-            }
-            String fieldCaption = field.split(":")[2];
-            String fieldLine = String.format("%s = fields.%s('%s', required=True)%n\t", fieldName, fieldType,
-                    fieldCaption);
-            Util.appendToFile(fieldLine, modelPath);
         }
     }
 
@@ -126,6 +103,28 @@ public class ModelGenerator {
         String rel = field.split(":")[2];
         String fieldCaption = field.split(":")[3];
         String fieldLine = String.format("%s = fields.Many2many('%s', '%s')%n\t", field.split(":")[0], rel, fieldCaption);
+        Util.appendToFile(fieldLine, modelPath);
+    }
+
+    private static void addPrimitiveField(String field, String modelPath) throws IOException {
+        String fieldName = field.split(":")[0];
+        String fieldType = field.split(":")[1];
+        if (fieldType.equals("c")) {
+            fieldType = "Char";
+        } else if (fieldType.equals("i")) {
+            fieldType = "Integer";
+        } else if (fieldType.equals("f")) {
+            fieldType = "Float";
+        } else if (fieldType.equals("b")) {
+            fieldType = "Boolean";
+        } else if (fieldType.equals("t")) {
+            fieldType = "Text";
+        } else if (fieldType.equals("h")) {
+            fieldType = "Html";
+        }
+        String fieldCaption = field.split(":")[2];
+        String fieldLine = String.format("%s = fields.%s('%s', required=True)%n\t", fieldName, fieldType,
+                fieldCaption);
         Util.appendToFile(fieldLine, modelPath);
     }
 
