@@ -1,5 +1,6 @@
 package org.galactis.od;
 
+import java.io.File;
 import java.io.IOException;
 
 public class MenuGenerator {
@@ -13,6 +14,9 @@ public class MenuGenerator {
         for (String token : menu.split(" ")) {
             if (token.split(":")[0].equals("i")) {
                 id = token.split(":")[1];
+                if (id.contains(".")) {
+                    throw new MenuException("Menuitem Id should not contain '.'");
+                }
             } else if (token.split(":")[0].equals("n")) {
                 name = token.split(":")[1];
             } else if (token.split(":")[0].equals("p")) {
@@ -31,7 +35,7 @@ public class MenuGenerator {
         }
 
         id = id != null ? id + "_menu" : model.replace(".", "_") + "_menu";
-        if (Util.alreadyExists("<menuitem id=\"" + id + "\"", "./views/menu.xml")) {
+        if (Util.alreadyExists("./views/menu.xml") && Util.in("id=\"" + id + "\"", "./views/menu.xml")) {
             return;
         }
         if (action == null && model != null) {
@@ -42,12 +46,30 @@ public class MenuGenerator {
             menuItemBuilder.append(" action=\"action_" + action + "\"");
         }
         if (parent != null) {
-            menuItemBuilder.append(" parent=\"" + parent + "\"");
+            String parentId = null;
+            String path = null;
+            if (parent.contains(".")) {
+                parentId = parent.substring(parent.indexOf(".") + 1);
+                path = "../" + parent.substring(0, parent.indexOf(".")) + "/views/menu.xml";
+            } else {
+                parentId = parent;
+                path = "./views/menu.xml";
+            }
+            if (!Util.alreadyExists(path) || !Util.in("id=\"" + parentId + "_menu\"", path)) {
+                throw new MenuException("The specified parent menu doesn't exist");
+            }
+            menuItemBuilder.append(" parent=\"" + parent + "_menu\"");
         }
         menuItemBuilder.append(" sequence=\"50\"/>\n");
-        String menuItem = String.format(menuItemBuilder.toString(), id, name);        
-
-        Util.appendToFile(menuItem, "./views/menu.xml");
+        String menuItem = String.format(menuItemBuilder.toString(), id, name);
+        if (!Util.alreadyExists("./views")) {
+            new File("./views").mkdir();
+        }
+        if (parent == null) {
+            Util.printToFile("<odoo>\n\t<data>\n\t\t" + menuItem + "\n\t</data>\n</odoo>", "./views/menu.xml");
+        } else {
+            Util.insertIntoFileAfter(menuItem, "id=\"" + parent + "_menu\"", "./views/menu.xml");
+        }
     }
 
 }

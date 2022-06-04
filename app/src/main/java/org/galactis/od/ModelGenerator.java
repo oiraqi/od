@@ -39,18 +39,18 @@ public class ModelGenerator {
             code += "_description = '%s'\n\n\tname = fields.Char('Name', required=True)\n\t";
             String className = Util.getClassName(model);
             code = String.format(code, className, "name", model,
-                description == null ? Util.getClassName(model) : description);
+                    description == null ? Util.getClassName(model) : description);
         } else {
             code += "\n\t";
             String className = Util.getClassName(model);
             code = String.format(code, className, "inherit", model);
-        }       
+        }
 
         Util.printToFile(code, modelFile.getPath());
         String init = "from . import " + Util.getModelShortUnderscoredName(model);
-        if (!Util.alreadyExists(init, "./__init__.py")) {
+        if (!Util.alreadyExists("./models/__init__.py") || !Util.in(init, "./models/__init__.py")) {
             Util.appendToFile(init + "\n", "./models/__init__.py");
-        }        
+        }
 
         if (groups != null) {
             updateAccessRights(model, groups);
@@ -59,45 +59,28 @@ public class ModelGenerator {
 
     public static void addFields(String model, String fields) throws IOException {
         String fileName = Util.getModelShortUnderscoredName(model);
-        File modelFile = new File("./models/" + fileName + ".py"); // Path Traversal!!!
+        String modelPath = "./models/" + fileName + ".py"; // Path Traversal!!!
         String[] fieldz = fields.split(" ");
         for (String field : fieldz) {
             String fieldName = field.split(":")[0];
+            if (Util.in(fieldName + " = ", modelPath)) {
+                continue;
+            }
+            
             String fieldType = field.split(":")[1];
 
             if (fieldType.equals("mo")) {
-                String rel = field.split(":")[2];
-                String fieldCaption = field.split(":")[3];
-                String fieldLine = String.format("%s = fields.Many2one('%s', '%s', required=True)%n\t", fieldName, rel,
-                        fieldCaption);
-                Util.appendToFile(fieldLine, modelFile.getPath());
+                addMany2oneField(field, modelPath);
                 continue;
             }
 
             if (fieldType.equals("om")) {
-                String rel = field.split(":")[2];
-                String fieldInverse = Util.getModelShortUnderscoredName(model) + "_id";
-                String fieldCaption = field.split(":")[3];
-                String fieldLine = String.format("%s = fields.One2many('%s', '%s', '%s')%n\t", fieldName, rel,
-                        fieldInverse, fieldCaption);
-                Util.appendToFile(fieldLine, modelFile.getPath());
+                addOne2manyField(field, model, modelPath);
                 continue;
             }
 
             if (fieldType.equals("mm")) {
-                String rel = field.split(":")[2];
-                String fieldCaption = field.split(":")[3];
-                String fieldLine = String.format("%s = fields.Many2many('%s', '%s')%n\t", fieldName, rel, fieldCaption);
-                Util.appendToFile(fieldLine, modelFile.getPath());
-                continue;
-            }
-
-            if (fieldType.equals("mo")) {
-                String rel = field.split(":")[2];
-                String fieldCaption = field.split(":")[3];
-                String fieldLine = String.format("%s = fields.Many2one('%s', '%s', required=True)%n\t", fieldName, rel,
-                        fieldCaption);
-                Util.appendToFile(fieldLine, modelFile.getPath());
+                addMany2manyField(field, modelPath);
                 continue;
             }
 
@@ -117,8 +100,33 @@ public class ModelGenerator {
             String fieldCaption = field.split(":")[2];
             String fieldLine = String.format("%s = fields.%s('%s', required=True)%n\t", fieldName, fieldType,
                     fieldCaption);
-            Util.appendToFile(fieldLine, modelFile.getPath());
+            Util.appendToFile(fieldLine, modelPath);
         }
+    }
+
+    private static void addMany2oneField(String field, String modelPath) throws IOException {
+        String rel = field.split(":")[2];
+        String fieldCaption = field.split(":")[3];
+        String fieldLine = String.format("%s = fields.Many2one('%s', '%s', required=True)%n\t", field.split(":")[0],
+                rel,
+                fieldCaption);
+        Util.appendToFile(fieldLine, modelPath);
+    }
+
+    private static void addOne2manyField(String field, String model, String modelPath) throws IOException {
+        String rel = field.split(":")[2];
+        String fieldInverse = Util.getModelShortUnderscoredName(model) + "_id";
+        String fieldCaption = field.split(":")[3];
+        String fieldLine = String.format("%s = fields.One2many('%s', '%s', '%s')%n\t", field.split(":")[0], rel,
+                fieldInverse, fieldCaption);
+        Util.appendToFile(fieldLine, modelPath);
+    }
+
+    private static void addMany2manyField(String field, String modelPath) throws IOException {
+        String rel = field.split(":")[2];
+        String fieldCaption = field.split(":")[3];
+        String fieldLine = String.format("%s = fields.Many2many('%s', '%s')%n\t", field.split(":")[0], rel, fieldCaption);
+        Util.appendToFile(fieldLine, modelPath);
     }
 
     private static void updateAccessRights(String model, String groups) throws IOException {
@@ -126,7 +134,7 @@ public class ModelGenerator {
         StringBuilder sb = new StringBuilder();
         for (String groupRight : groupz) {
             String group = groupRight.split(":")[0];
-            if (Util.alreadyExists("access_" + model.replace(".", "_") + "_" + Util.getGroupShortName(group),
+            if (Util.in("access_" + model.replace(".", "_") + "_" + Util.getGroupShortName(group),
                     "./security/ir.model.access.csv")) {
                 continue;
             }
@@ -140,7 +148,7 @@ public class ModelGenerator {
         }
         if (sb.length() > 0) {
             sb.append("\n");
-        }        
+        }
         Util.appendToFile(sb.toString(), "./security/ir.model.access.csv");
     }
 }

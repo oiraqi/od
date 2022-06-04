@@ -2,6 +2,7 @@ package org.galactis.od;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -53,6 +54,26 @@ public class Util {
         }
     }
 
+    public static void insertIntoFileAfter(String line, String marker, String path) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        String l = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            while ((l = br.readLine()) != null) {                
+                sb.append(l);
+                sb.append("\n");
+                if (l.indexOf(marker) >= 0) {
+                    sb.append("\t\t");
+                    sb.append(line);
+                    sb.append("\n");
+                }
+            }
+        }
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(path)))) {
+            pw.print(sb.toString());
+            pw.flush();
+        }
+    }
+
     public static String getViewPath(String model) {
         return "./views/" + model.substring(model.indexOf(".") + 1) + "_view.xml";
     }
@@ -65,7 +86,11 @@ public class Util {
         return group.substring(group.indexOf("group_") + 6);
     }
 
-    public static boolean alreadyExists(String content, String path) throws IOException {
+    public static boolean alreadyExists(String path) {
+        return new File(path).exists();
+    }
+    
+    public static boolean in(String content, String path) throws IOException {
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line = null;
             while((line = br.readLine()) != null) {

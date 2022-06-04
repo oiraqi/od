@@ -12,7 +12,6 @@ public class App {
 
     public static void main(String[] args) throws Exception {
         Map<String, String> argMap = CommandParser.parse(args);
-        System.out.println(argMap);
         String model = null;
         boolean inherit = false;
         if (argMap.get("n") != null) {
