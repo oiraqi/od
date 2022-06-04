@@ -82,27 +82,30 @@ public class ModelGenerator {
     }
 
     private static void addMany2oneField(String field, String modelPath) throws IOException {
+        String fieldName = field.split(":")[0];
         String rel = field.split(":")[2];
         String fieldCaption = field.split(":")[3];
-        String fieldLine = String.format("%s = fields.Many2one('%s', '%s', required=True)%n\t", field.split(":")[0],
+        String fieldLine = String.format("%s = fields.Many2one('%s', '%s', required=True)%n\t", fieldName,
                 rel,
                 fieldCaption);
         Util.appendToFile(fieldLine, modelPath);
     }
 
     private static void addOne2manyField(String field, String model, String modelPath) throws IOException {
+        String fieldName = field.split(":")[0];
         String rel = field.split(":")[2];
         String fieldInverse = Util.getModelShortUnderscoredName(model) + "_id";
         String fieldCaption = field.split(":")[3];
-        String fieldLine = String.format("%s = fields.One2many('%s', '%s', '%s')%n\t", field.split(":")[0], rel,
+        String fieldLine = String.format("%s = fields.One2many('%s', '%s', '%s')%n\t", fieldName, rel,
                 fieldInverse, fieldCaption);
         Util.appendToFile(fieldLine, modelPath);
     }
 
     private static void addMany2manyField(String field, String modelPath) throws IOException {
+        String fieldName = field.split(":")[0];
         String rel = field.split(":")[2];
         String fieldCaption = field.split(":")[3];
-        String fieldLine = String.format("%s = fields.Many2many('%s', '%s')%n\t", field.split(":")[0], rel, fieldCaption);
+        String fieldLine = String.format("%s = fields.Many2many('%s', '%s')%n\t", fieldName, rel, fieldCaption);
         Util.appendToFile(fieldLine, modelPath);
     }
 
