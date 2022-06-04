@@ -86,7 +86,7 @@ public class Util {
         return group.substring(group.indexOf("group_") + 6);
     }
 
-    public static boolean alreadyExists(String path) {
+    public static boolean exists(String path) {
         return new File(path).exists();
     }
     
@@ -95,6 +95,19 @@ public class Util {
             String line = null;
             while((line = br.readLine()) != null) {
                 if (line.indexOf(content) >= 0) {
+                    return true;
+                }
+            }
+            return false;
+        }        
+    }
+
+    public static boolean fieldExists(String fieldName, String path) throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line = null;
+            while((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith(fieldName + "=") || line.startsWith(fieldName + " =")) {
                     return true;
                 }
             }

@@ -48,7 +48,7 @@ public class ModelGenerator {
 
         Util.printToFile(code, modelFile.getPath());
         String init = "from . import " + Util.getModelShortUnderscoredName(model);
-        if (!Util.alreadyExists("./models/__init__.py") || !Util.in(init, "./models/__init__.py")) {
+        if (!Util.exists("./models/__init__.py") || !Util.in(init, "./models/__init__.py")) {
             Util.appendToFile(init + "\n", "./models/__init__.py");
         }
 
@@ -63,7 +63,7 @@ public class ModelGenerator {
         String[] fieldz = fields.split(" ");
         for (String field : fieldz) {
             String fieldName = field.split(":")[0];
-            if (Util.in(fieldName + " = ", modelPath)) {
+            if (Util.fieldExists(fieldName, modelPath)) {
                 continue;
             }
 
