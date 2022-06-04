@@ -2,9 +2,6 @@
 	<data>
 		<menuitem id="a3_root_menu" name="Home" sequence="50"/>
 		<menuitem id="a3_catalog_menu" name="Catalog" parent="a3_root_menu" sequence="50"/>
-
 		<menuitem id="a3_course_menu" name="Courses" action="action_course" parent="a3_root_menu" sequence="50"/>
-
-
 	</data>
 </odoo>

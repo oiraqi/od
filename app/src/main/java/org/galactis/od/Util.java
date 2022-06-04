@@ -114,4 +114,10 @@ public class Util {
             return false;
         }        
     }
+
+    public static String getModule() {
+        String cp = new File(".").getAbsolutePath();
+        System.out.println(cp.split("/")[cp.split("/").length - 2]);
+        return cp.split("/")[cp.split("/").length - 2];
+    }
 }
